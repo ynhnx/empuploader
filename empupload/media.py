@@ -226,20 +226,25 @@ def getImageSizeHelper(filepath):
     data=Image.open(filepath)
     return data.width *data.height
 
+"""
+Generate maxfile as three 2s segments of video at 25, 50 and 75%
+Change output to 240p
+"""
 def videoSplitter(maxfile):
     suffix=Path(maxfile).suffixes[-1]
     video,audio=metadata(maxfile)
     fps=float(re.search("[0-9.]*",video.get("frame_rate")).group(0))
     duration=video.get("other_duration")/1000
-    startTime=math.floor(float(duration))*(settings.gifStart/100)
-    endTime=min(startTime+settings.gifLength,duration)
+    startTime1=math.floor(float(duration))*0.25
+    startTime2=math.floor(float(duration))*0.50
+    startTime3=math.floor(float(duration))*0.75
     tempVideoDir=tempfile.mkdtemp(dir=settings.tmpdir)
     intervid=os.path.join(tempVideoDir,f"inter{suffix}")
     tempVideo=os.path.join(tempVideoDir,f"tempvid{suffix}")
-    console.console.print(f"Splitting section of video from {startTime} secs to {endTime} secs",style="yellow")
+    console.console.print(f"Splitting section of video at {startTime1}, {startTime2} and {startTime3} secs",style="yellow")
     ffmpeg=ffmpegHelper()
-    proc=subprocess.run([ffmpeg,"-i",maxfile, "-ss" ,f"{startTime}", "-to", f"{endTime}" ,"-c" ,"copy", intervid],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    proc2=subprocess.run([ffmpeg,"-i",intervid,"-filter:v", f"fps={fps/2}",tempVideo],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    proc=subprocess.run([ffmpeg, "-ss", f"{startTime1}", "-t", "2", "-i", maxfile, "-ss", f"{startTime2}", "-t", "2", "-i", maxfile, "-ss", f"{startTime3}", "-t", "2", "-i", maxfile, "-filter_complex", "[0][1]concat=n=2:v=1:a=1", intervid],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    proc2=subprocess.run([ffmpeg,"-i",intervid,"-vf","scale=320:240","-filter:v", f"fps={fps/2}",tempVideo],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     # print(proc.stdout.decode())
     # print(proc.stderr.decode())
     # print(proc.stderr.decode())
