@@ -82,13 +82,14 @@ def process_yml(inputPath,ymlpath):
         emp_dict["category"]=paths.getcat()[selection.singleoptions("Enter Category:",paths.getcat().keys())]
         emp_dict["taglist"]=_tagfixer(selection.strinput("Enter Tags Seperated By Space:"))
         emp_dict["desc"]=selection.strinput("Enter Description:",multiline=True)
-        emp_dict["staticimg"]=media.createStaticImagesDict(args.prepare.images) or {}
+        emp_dict["staticimg"]=media.upload_screenshots(args.prepare.images)
+        console.console.print(emp_dict)
         emp_dict["mediaInfo"]={}
         emp_dict["mediaInfo"]["audio"]=audio or {}
         emp_dict["mediaInfo"]["video"]=video or {}
         emp_dict["tracker"]=args.prepare.tracker
         emp_dict["exclude"]=args.prepare.exclude
-        emp_dict["cover"]=media.createcovergif(tempPicDir,maxfile)
+        #emp_dict["cover"]=media.createcovergif(tempPicDir,maxfile)
         media.create_images(files,tempPicDir)
         imgfiles,imglocation=media.zip_images(inputPath,tempPicDir)
         files.extend(imgfiles)
@@ -113,13 +114,6 @@ def process_yml(inputPath,ymlpath):
         paths.remove(p)
 
 
-
-
-
-
-
-
-
 """
 Update yml config
 
@@ -129,6 +123,8 @@ Update yml config
 """
 def update_yml(ymlpath):
     mirrorDir=None
+    tempPicDir=None
+    temptorrent=None
     try:
         f=open(ymlpath,"r")
         emp_dict= yaml.safe_load(f)
@@ -138,6 +134,7 @@ def update_yml(ymlpath):
         Path(mirrorDir).mkdir()
         os.chdir(mirrorDir)
 
+        """
         if Path(emp_dict["inputPath"]).is_file():
             Path(emp_dict["inputPath"]).symlink_to(Path(baseName),target_is_directory=True)
         else:
@@ -145,6 +142,21 @@ def update_yml(ymlpath):
                 if p.name=="screens.zip" or p.name=="screens":
                     continue
                 Path(p.name).symlink_to(p,target_is_directory=p.is_dir())
+        """
+
+        if Path(emp_dict["inputPath"]).is_file():
+            link_target = Path(baseName)
+            link_name = Path(emp_dict["inputPath"])
+            if not link_name.exists():
+                link_name.symlink_to(link_target, target_is_directory=True)
+        else:
+            for p in Path(emp_dict["inputPath"]).iterdir():
+                if p.name == "screens.zip" or p.name == "screens":
+                    continue
+                link_target = p
+                link_name = Path(p.name)
+                if not link_name.exists():
+                    link_name.symlink_to(link_target, target_is_directory=p.is_dir())
             
                 
         emp_dict["title"]=selection.strinput("Enter Title For Upload:",default=emp_dict["title"])
@@ -166,6 +178,9 @@ def update_yml(ymlpath):
             emp_dict["screens"]=media.upload_images(media.imagesorter(tempPicDir))
             files.extend(imgfiles)
             torrent.create_torrent(temptorrent,mirrorDir,files,tracker=emp_dict["tracker"])
+
+        console.console.print(emp_dict["staticimg"])
+
         if selection.singleoptions("Manually Edit the upload page 'Description' Box",choices=["Yes","No"])=="Yes":
 
             emp_dict["template"]=selection.strinput(msg="",default=getPostStr(emp_dict),multiline=True)
@@ -188,7 +203,7 @@ def update_yml(ymlpath):
         console.console.print(traceback.format_exc())
     finally:
         #force removal
-        paths.rm( tempPicDir)
+        paths.rm(tempPicDir)
         paths.rm(temptorrent)
         paths.rm(mirrorDir)
        
@@ -205,10 +220,14 @@ def getPostStr(emp_dict):
             "title":emp_dict.get("title","placeholder"),
             "cover":emp_dict.get("cover",["placeholder"]),
                 "desc":emp_dict.get("desc",["placeholder"]),
-            "screens":emp_dict.get("screens")
+            "screens":emp_dict.get("screens"),
+            "staticimg":emp_dict.get("staticimg"),
+            "mediaInfo":templateMediaInfoHelper(emp_dict.get("mediaInfo").get("audio"),emp_dict.get("mediaInfo").get("video"))
         }
-    nameSpace.update(emp_dict["staticimg"])
-    nameSpace.update(templateMediaInfoHelper(emp_dict["mediaInfo"]["audio"],emp_dict["mediaInfo"]["video"]))
+    #nameSpace.update(emp_dict["staticimg"])
+    console.console.print(nameSpace["mediaInfo"])
+    console.console.print(nameSpace["staticimg"])
+    #nameSpace.update(templateMediaInfoHelper(emp_dict["mediaInfo"]["audio"],emp_dict["mediaInfo"]["video"]))
     nameSpace.update({"torrent":emp_dict["torrent"],"args":args,"inputPath":emp_dict["inputPath"]})
     t = Template((emp_dict.get("template") or templateHelper() or ""),searchList=[nameSpace])
     return str(t)
