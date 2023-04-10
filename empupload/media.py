@@ -64,8 +64,8 @@ def create_images(mediafiles,picdir):
     console.console.print("Creating screens",style="yellow")
     mtn=mtnHelper()
     for count,file in enumerate(mediafiles): 
-        key=os.urandom(4).hex()
-        t=subprocess.run([mtn,'-c','3','-r','3','-w','2880','-k','060237','-j','92','-b','2','-f',settings.font,file,"-P",'-O',picdir,"-o",f"_{key}.jpg"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT) 
+        #key=os.urandom(4).hex()
+        t=subprocess.run([mtn,'-c','3','-g','4','-r','8','-f',settings.font,file,"-P",'-O',picdir,"-o",f"_s.jpg"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT) 
         if t.returncode==0 or t.returncode==1:
             console.console.print(f"{count+1}. Image created for {file}",style="yellow")
         else:
@@ -122,10 +122,12 @@ def upload_images(imageList):
             if i>100:
                 console.console.print("Max images reached",style="yellow")
                 break
-            upload=network.fapping_upload(image,msg=True,remove=True)
-            if i<settings.maxNumPostImages and upload!="":
+            upload=network.fapping_upload(image,False,msg=True,remove=True)
+            """if i<settings.maxNumPostImages and upload!="":
                 upload=f"[img={settings.postImageSize}]{upload}[/img]"
                 imgstring=f"{imgstring}{upload}"
+            """    
+            imgstring=f"{imgstring}{upload}"
     return imgstring
 """
 Zip images or create  directory or photo storage
@@ -136,6 +138,24 @@ Zip images or create  directory or photo storage
 
 :returns None: 
 """
+
+def upload_screenshots(input):
+    images_dict = createStaticImagesDict(input)
+    urls = {}
+    i = 0
+    for img_path in images_dict:
+        if os.path.isdir(img_path) and os.path.basename(img_path) == "@eaDir":
+            continue
+        url = network.fapping_upload(img_path, thumbnail=False, msg=False, remove=False)
+        console.console.print(f"Uploaded screenshot at {url}")
+        if i == 0:
+            urls["cover"] = url
+        else:
+            urls[chr(i+96)] = url
+        i += 1
+    return urls
+
+
 def zip_images(inputPath,picdir,output="screens"):
     #zip or just move images to directory being uploaded to EMP
     files=list(Path(picdir).iterdir())
@@ -218,18 +238,27 @@ def createStaticImagesDict(input):
     outdict={}
     if input==None or not Path(input).exists():
         return outdict
+    else:
+        return alphanumimagesorter(Path(input))
+    
+"""
+Sort in alphanumerical order
+"""
+def alphanumimagesorter(picdir):
+    imageList = list(map(lambda x: str(x), Path(picdir).iterdir()))
+    return list(sorted(imageList, reverse=False))
+
 def imagesorter(picdir):
     imageList=list(map(lambda x:str(x),Path(picdir).iterdir()))
     return list(sorted(imageList,key=lambda x:getImageSizeHelper(x),reverse=True))
+
+
 
 def getImageSizeHelper(filepath):
     data=Image.open(filepath)
     return data.width *data.height
 
-"""
-Generate maxfile as three 2s segments of video at 25, 50 and 75%
-Change output to 240p
-"""
+
 def videoSplitter(maxfile):
     suffix=Path(maxfile).suffixes[-1]
     video,audio=metadata(maxfile)
