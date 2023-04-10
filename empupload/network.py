@@ -1,4 +1,3 @@
-
 #! /usr/bin/env python3
 import json
 import requests
@@ -6,7 +5,8 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 import general.console as console
 import settings as settings
-def fapping_upload(img_path,thumbnail=True,msg=False,remove=True):
+
+def fapping_upload(img_path,thumbnail=False,msg=False,remove=True):
     """
     Uploads an image to fapping.sx and returns the image_id to access it
     Parameters
@@ -31,7 +31,8 @@ def fapping_upload(img_path,thumbnail=True,msg=False,remove=True):
         soup = BeautifulSoup(image.text, 'html.parser')
         list=soup.find_all("input")
         #get bbcode for upload, thumbnails
-        if thumbnail:
+        """
+        if thumbnail==True:
             link=list[3]["value"]
             printmsgHelper(link,msg)
             return link
@@ -40,8 +41,10 @@ def fapping_upload(img_path,thumbnail=True,msg=False,remove=True):
             link= soup.find_all("input")[1]["value"]
             printmsgHelper(link,msg)
             return link
-
-
+        """
+        link= soup.find_all("input")[1]["value"]
+        printmsgHelper(link,msg)
+        return link
 
     else:
         console.console.print(f"Error Uploading\n Status: {r.status_code}\n{r.text}",style="red")
