@@ -3,25 +3,72 @@
 [td=90%][align=center][color=#f4f4f4][b][size=5]${title}[/size][/b][/color][/align][/td]
 [/tr]
 [/table]
-[align=center][img=300]${cover}[/img][/align]
+[align=center][img=800]${staticimg.cover}[/img][/align]
 
 
 
 [hr][hr]
 
 
-
-[table=nball]
+[table=852px,nball]
 [tr=gradient:to right;#0000 15%;#000000;#000000;#0000 85%]
-[td=90%][align=center][color=#f4f4f4][b][size=3]Desc[/size][/b][/color][/align][/td]
+[td=90%][align=center][color=#f4f4f4][b][size=3]DETAILS[/size][/b][/color][/align][/td]
 [/tr]
 [/table]
-${desc}
+
+[table=nball,50%]
+[tr][td=10%][size=2][center][u][b]Resolution[/b][/u][/center][/size] [center][img]https://jerking.empornium.ph/images/2018/03/16/resolution.png[/img]
+[size=2]$mediaInfo.video_other_width x $mediaInfo.video_other_height [/size][/center]  [/td][td=10%][size=2][center][u][b]Duration[/b][/u][/center][/size][center][img]https://jerking.empornium.ph/images/2018/03/16/duration.png[/img]
+[size=2]$mediaInfo.video_duration [/size][/center]    [/td][td=10%][size=2][center][u][b]Format[/b][/u][/center][/size][center][img]https://jerking.empornium.ph/images/2018/03/16/format.png[/img]
+[size=2]MP4/H264[/size][/center]    [/td][td=10%][size=2][center][u][b]Bitrate[/b][/u][/center][/size][center][img]https://jerking.empornium.ph/images/2017/05/29/size.png[/img]
+[size=2]$mediaInfo.video_bit_rate [/size][/center]
+[/td]
+[/tr]
+[/table]
+
+[table=60%,nball]
+[tr][td][size=2]
+${desc}[/size][/td]
+[/tr]
+[/table]
+
 
 [hr][hr]
 
 
+[table=852px,nball]
+[tr=gradient:to right;#0000 15%;#000000;#000000;#0000 85%]
+[td=90%][align=center][color=#f4f4f4][b][size=3]IMAGES[/size][/b][/color][/align][/td]
+[/tr]
+[/table]
+[align=center][size=1][color=#919191][font=Lucida Sans Unicode]Click images to englarge[/font][/color][/size][/align]
+[align=center]
+[table=90%,nball]
+[tr]
+[td] [img=500]$staticimg.a [/img] [/td]
 
+[td] [img=500]$staticimg.b [/img] [/td]
+[/tr]
+
+[tr]
+[td] [img=500]$staticimg.c [/img] [/td]
+
+[td] [img=500]$staticimg.d [/img] [/td]
+[/tr]
+
+[tr]
+[td] [img=500]$staticimg.e [/img] [/td]
+
+[td] [img=500]$staticimg.f [/img] [/td]
+[/tr]
+
+[tr]
+[td] [img=500]$staticimg.g [/img] [/td]
+
+[td] [img=500]$staticimg.h [/img] [/td]
+[/tr]
+
+[/table][/align]
 
 [hr][hr]
 
@@ -31,4 +78,4 @@ ${desc}
 [td=90%][align=center][color=#f4f4f4][b][size=3]SCREENSHOTS[/size][/b][/color][/align][/td]
 [/tr]
 [/table]
-[align=center]${screens}[/align]
+[align=center][img=1100]${screens}[/img][/align]
